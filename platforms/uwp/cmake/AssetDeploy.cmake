@@ -1,5 +1,5 @@
 function(uwp_pkg TARGET SOURCE_DIR DEST_SUBDIR)
-    file(GLOB_RECURSE FILES RELATIVE "${SOURCE_DIR}" "${SOURCE_DIR}/*")
+    file(GLOB_RECURSE FILES CONFIGURE_DEPENDS RELATIVE "${SOURCE_DIR}" "${SOURCE_DIR}/*")
 
     foreach(FILE_IN_DIR ${FILES})
         # UWP needs dll's in the root, skip or it will overwrite main cmake config for special dll files
