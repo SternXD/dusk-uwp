@@ -10,8 +10,8 @@ function(uwp_pkg TARGET SOURCE_DIR DEST_SUBDIR)
         set(SRC "${SOURCE_DIR}/${FILE_IN_DIR}")
 
         get_filename_component(REL_DIR "${FILE_IN_DIR}" DIRECTORY)
-
-        if(REL_DIR STREQUAL ".")
+        string(REPLACE "\\" "/" REL_DIR "${REL_DIR}")
+        if(REL_DIR STREQUAL "" OR REL_DIR STREQUAL ".")
             set(DEPLOY_DIR "${DEST_SUBDIR}")
         else()
             set(DEPLOY_DIR "${DEST_SUBDIR}/${REL_DIR}")

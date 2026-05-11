@@ -5,10 +5,6 @@ if (NOT CMAKE_BUILD_TYPE)
             "Build type options: Debug Release RelWithDebInfo MinSizeRel" FORCE)
 endif ()
 
-# hack: todo cleanup
-# aurora and some other deps slipped thru as /MT for some reason
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
-
 # obtain revision info from git
 find_package(Git)
 if (GIT_FOUND)
@@ -104,6 +100,8 @@ set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "_cmake")
 if (CMAKE_SYSTEM_NAME STREQUAL Linux)
   set(DAWN_USE_WAYLAND ON CACHE BOOL "Enable support for Wayland surface" FORCE)
 endif ()
+
+option(DUSK_UWP "Enable UWP compat support" ON)
 set(AURORA_ENABLE_DVD ON CACHE BOOL "Enable DVD API support" FORCE)
 set(AURORA_ENABLE_CARD ON CACHE BOOL "Enable CARD API support" FORCE)
 set(AURORA_ENABLE_RMLUI ON CACHE BOOL "Enable RmlUi UI support" FORCE)
@@ -116,7 +114,6 @@ option(DUSK_BUILD_WARNINGS "Enable compiler warnings (off by default)")
 option(DUSK_SELECTED_OPT "If on, selected parts of the project will be compiled with optimizations on Debug, intending to make the game run at 30 FPS. Note for MSVC: you will need to remove '/RTC1' from your debug flags in CMake.")
 option(DUSK_MOVIE_SUPPORT "If on, compile against libjpeg-turbo to enable THP file decoding" ON)
 option(DUSK_ENABLE_UPDATE_CHECKER "Enable update checking support" ON)
-option(DUSK_UWP "Enable UWP compat support" ON)
 
 if(ANDROID)
     set(DUSK_MOVIE_SUPPORT OFF)
@@ -449,8 +446,8 @@ if(ANDROID)
     add_library(dusk SHARED ${DUSK_FILES})
     set_target_properties(dusk PROPERTIES OUTPUT_NAME main)
 elseif(DUSK_UWP)
-    add_compile_definitions(_UWP)
     add_library(dusk STATIC ${DUSK_FILES})
+    target_compile_definitions(dusk PRIVATE _UWP)
 else ()
     add_executable(dusk ${DUSK_FILES})
 endif ()
