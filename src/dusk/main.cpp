@@ -219,11 +219,15 @@ int DuskMain(int argc, char* argv[]) {
 
 }  // namespace
 
+#ifdef _UWP
+#define SDL_MAIN_EXPORTED
+#include "SDL3/SDL_main.h"
+#endif
 int main(int argc, char* argv[]) {
     return DuskMain(argc, argv);
 }
 
-#if _WIN32
+#if _WIN32 && !_UWP
 int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int) {
     return RunWindowsGuiEntryPoint();
 }
