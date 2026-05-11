@@ -7,6 +7,11 @@ endif ()
 
 set(DUSK_VERSION_OVERRIDE "" CACHE STRING "Override version string (skips git detection and format validation)")
 
+if (MSVC)
+    # aurora and some other deps slipped thru as /MT for some reason
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+endif ()
+
 if (DUSK_VERSION_OVERRIDE)
     set(DUSK_WC_DESCRIBE "${DUSK_VERSION_OVERRIDE}")
     set(DUSK_VERSION_STRING "0.0.0.0")
@@ -16,47 +21,47 @@ if (DUSK_VERSION_OVERRIDE)
     set(DUSK_WC_DATE "")
     message(STATUS "Dusklight version overridden to ${DUSK_WC_DESCRIBE}")
 else ()
-    # obtain revision info from git
     find_package(Git)
-if (GIT_FOUND)
-    # make sure version information gets re-run when the current Git HEAD changes
-    execute_process(WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} COMMAND ${GIT_EXECUTABLE} rev-parse --git-path HEAD
-            OUTPUT_VARIABLE dusk_git_head_filename
-            OUTPUT_STRIP_TRAILING_WHITESPACE)
-    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${dusk_git_head_filename}")
+    if (GIT_FOUND)
+        # make sure version information gets re-run when the current Git HEAD changes
+        execute_process(WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} COMMAND ${GIT_EXECUTABLE} rev-parse --git-path HEAD
+                OUTPUT_VARIABLE dusk_git_head_filename
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
+        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${dusk_git_head_filename}")
 
-    execute_process(WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} COMMAND ${GIT_EXECUTABLE} rev-parse --symbolic-full-name HEAD
-            OUTPUT_VARIABLE dusk_git_head_symbolic
-            OUTPUT_STRIP_TRAILING_WHITESPACE)
-    execute_process(WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-            COMMAND ${GIT_EXECUTABLE} rev-parse --git-path ${dusk_git_head_symbolic}
-            OUTPUT_VARIABLE dusk_git_head_symbolic_filename
-            OUTPUT_STRIP_TRAILING_WHITESPACE)
-    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${dusk_git_head_symbolic_filename}")
+        execute_process(WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} COMMAND ${GIT_EXECUTABLE} rev-parse --symbolic-full-name HEAD
+                OUTPUT_VARIABLE dusk_git_head_symbolic
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
+        execute_process(WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+                COMMAND ${GIT_EXECUTABLE} rev-parse --git-path ${dusk_git_head_symbolic}
+                OUTPUT_VARIABLE dusk_git_head_symbolic_filename
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
+        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${dusk_git_head_symbolic_filename}")
 
-    # defines DUSK_WC_REVISION
-    execute_process(WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} COMMAND ${GIT_EXECUTABLE} rev-parse HEAD
-            OUTPUT_VARIABLE DUSK_WC_REVISION
-            OUTPUT_STRIP_TRAILING_WHITESPACE)
-    # defines DUSK_WC_DESCRIBE
-    execute_process(WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} COMMAND ${GIT_EXECUTABLE} describe --tags --long --dirty --match "v*"
-            OUTPUT_VARIABLE DUSK_WC_DESCRIBE
-            OUTPUT_STRIP_TRAILING_WHITESPACE)
+        # defines DUSK_WC_REVISION
+        execute_process(WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} COMMAND ${GIT_EXECUTABLE} rev-parse HEAD
+                OUTPUT_VARIABLE DUSK_WC_REVISION
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
+        # defines DUSK_WC_DESCRIBE
+        execute_process(WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} COMMAND ${GIT_EXECUTABLE} describe --tags --long --dirty --match "v*"
+                OUTPUT_VARIABLE DUSK_WC_DESCRIBE
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-    # remove the git hash, then collapse a clean "-0" suffix only
-    string(REGEX REPLACE "-[^-]+(-dirty|)$" "\\1" DUSK_WC_DESCRIBE "${DUSK_WC_DESCRIBE}")
-    string(REGEX REPLACE "-0$" "" DUSK_WC_DESCRIBE "${DUSK_WC_DESCRIBE}")
+        # remove the git hash, then collapse a clean "-0" suffix only
+        string(REGEX REPLACE "-[^-]+(-dirty|)$" "\\1" DUSK_WC_DESCRIBE "${DUSK_WC_DESCRIBE}")
+        string(REGEX REPLACE "-0$" "" DUSK_WC_DESCRIBE "${DUSK_WC_DESCRIBE}")
 
-    # defines DUSK_WC_BRANCH
-    execute_process(WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} COMMAND ${GIT_EXECUTABLE} rev-parse --abbrev-ref HEAD
-            OUTPUT_VARIABLE DUSK_WC_BRANCH
-            OUTPUT_STRIP_TRAILING_WHITESPACE)
-    # defines DUSK_WC_DATE
-    execute_process(WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} COMMAND ${GIT_EXECUTABLE} log -1 --format=%ad
-            OUTPUT_VARIABLE DUSK_WC_DATE
-            OUTPUT_STRIP_TRAILING_WHITESPACE)
-else ()
-    message(STATUS "Unable to find git, commit information will not be available")
+        # defines DUSK_WC_BRANCH
+        execute_process(WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} COMMAND ${GIT_EXECUTABLE} rev-parse --abbrev-ref HEAD
+                OUTPUT_VARIABLE DUSK_WC_BRANCH
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
+        # defines DUSK_WC_DATE
+        execute_process(WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} COMMAND ${GIT_EXECUTABLE} log -1 --format=%ad
+                OUTPUT_VARIABLE DUSK_WC_DATE
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
+    else ()
+        message(STATUS "Unable to find git, commit information will not be available")
+    endif ()
 endif ()
 
 if (DUSK_WC_DESCRIBE MATCHES "^v([0-9]+)\\.([0-9]+)\\.([0-9]+)([-+].*)?$")
@@ -72,8 +77,6 @@ else ()
     set(DUSK_WC_DESCRIBE "UNKNOWN-VERSION")
     set(DUSK_VERSION_STRING "0.0.0.0")
     set(DUSK_SHORT_VERSION_STRING "0.0.0")
-endif ()
-
 endif ()
 
 # Add version information to CI environment variables
