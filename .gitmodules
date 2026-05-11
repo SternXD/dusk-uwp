@@ -1,3 +1,4 @@
 [submodule "extern/aurora"]
 	path = extern/aurora
-	url = https://github.com/encounter/aurora.git
+	url = https://github.com/SternXD/aurora.git
+	branch = uwp-dusk
