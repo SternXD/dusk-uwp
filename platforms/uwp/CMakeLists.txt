@@ -189,4 +189,11 @@ endif()
 target_compile_definitions(${PROJECT_NAME} PRIVATE AURORA_WINDOWS_STORE)
 
 # Data deployment
-uwp_pkg(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/../../res "res")
+get_filename_component(DUSK_UWP_RES_DIR "${CMAKE_CURRENT_LIST_DIR}/../../res" ABSOLUTE)
+set(_dusk_uwp_pipeline_cache "${DUSK_UWP_RES_DIR}/initial_pipeline_cache.db")
+if(EXISTS "${_dusk_uwp_pipeline_cache}")
+	message(STATUS "dusk-uwp: bundled pipeline cache ${_dusk_uwp_pipeline_cache}")
+else()
+	message(WARNING "dusk-uwp: missing bundled pipeline cache at ${_dusk_uwp_pipeline_cache}")
+endif()
+uwp_pkg(${PROJECT_NAME} "${DUSK_UWP_RES_DIR}" "res")
