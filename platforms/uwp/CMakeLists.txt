@@ -46,14 +46,14 @@ message(STATUS "MSVC runtime library (UWP): ${CMAKE_MSVC_RUNTIME_LIBRARY}")
 
 # Fetch shared UWP deps
 FetchContent_Declare(UwpLibs
-    GIT_REPOSITORY https://github.com/worleydl/uwp-dep.git
-    GIT_TAG 33914f994ab6a3663a24279bd7a76c190eb4b4e4
+    GIT_REPOSITORY https://github.com/SternXD/uwp-dep.git
+    GIT_TAG ae39aa004ae127bd00f8262d28b401f8e4ed8728
 )
 FetchContent_MakeAvailable(UwpLibs)
 
 
 # Define project
-project(dusk-uwp LANGUAGES CXX)
+project(dusklight-uwp LANGUAGES CXX)
 set_directory_properties(PROPERTIES VS_STARTUP_PROJECT ${PROJECT_NAME})
 
 if(NOT DUSK_DIR)
@@ -73,6 +73,8 @@ set(BinDeps
 	${CMAKE_BINARY_DIR}/_deps/uwplibs-src/x64/bin/nod.dll
 	${CMAKE_BINARY_DIR}/_deps/uwplibs-src/x64/bin/SDL3.dll
 	${CMAKE_BINARY_DIR}/_deps/uwplibs-src/x64/bin/webgpu_dawn.dll
+	${CMAKE_BINARY_DIR}/_deps/uwplibs-src/x64/bin/libpng16.dll
+	${CMAKE_BINARY_DIR}/_deps/uwplibs-src/x64/bin/z.dll
 
 	Package.appxmanifest
 )
@@ -89,6 +91,7 @@ set(PkgAssets
 	Assets/Square44x44Logo.scale-200.png
 	Assets/Square150x150Logo.scale-200.png
 	Assets/StoreLogo.png
+	Assets/SplashScreen.scale-200.png
 )
 source_group("PkgAssets" FILES ${PkgAssets})
 set_source_files_properties(${PkgAssets} PROPERTIES
@@ -111,6 +114,8 @@ set(BinLibs
 	${CMAKE_BINARY_DIR}/_deps/uwplibs-src/x64/lib/nod.lib
 	${CMAKE_BINARY_DIR}/_deps/uwplibs-src/x64/lib/SDL3.lib
 	${CMAKE_BINARY_DIR}/_deps/uwplibs-src/x64/lib/webgpu_dawn.lib
+	${CMAKE_BINARY_DIR}/_deps/uwplibs-src/x64/lib/libpng16.lib
+	${CMAKE_BINARY_DIR}/_deps/uwplibs-src/x64/lib/z.lib
 
 	${DUSK_DIR}/extern/aurora/aurora_card.lib
 	${DUSK_DIR}/extern/aurora/aurora_core.lib
@@ -169,7 +174,7 @@ set(BinLibs
 	${DUSK_DIR}/JSystem_JSupport.lib
 	${DUSK_DIR}/JSystem_JUtility.lib
 
-	${DUSK_DIR}/dusk.lib	
+	${DUSK_DIR}/dusklight.lib	
 
 	WindowsApp.lib
 	OneCore.lib
@@ -188,4 +193,4 @@ endif()
 target_compile_definitions(${PROJECT_NAME} PRIVATE AURORA_WINDOWS_STORE)
 
 # Data deployment
-uwp_pkg(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/../res "res")
+uwp_pkg(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/../../res "res")

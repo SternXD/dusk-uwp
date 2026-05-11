@@ -8,15 +8,15 @@
   IgnorableNamespaces="uap mp">
 
   <Identity
-    Name="dusk"
+    Name="Dusklight"
     Publisher="CN=odolwa"
     Version="1.1.1.0" />
 
   <mp:PhoneIdentity PhoneProductId="5a528e66-e0fc-43fb-b377-ce0b1bb0d3e8" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>Dusk</DisplayName>
-    <PublisherDisplayName>danwo</PublisherDisplayName>
+    <DisplayName>Dusklight</DisplayName>
+    <PublisherDisplayName>danwo/SternXD</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
@@ -33,12 +33,13 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="uwp.App">
       <uap:VisualElements
-        DisplayName="Dusk"
+        DisplayName="Dusklight"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png"
-        Description="Port of Dusk for UWP"
+        Description="Port of Dusklight for UWP"
         BackgroundColor="transparent">
-	<!--<uap:SplashScreen Image="Assets\SplashScreen.png" /> -->
+	      <uap:SplashScreen 
+        Image="Assets\SplashScreen.png" />
         <uap:DefaultTile/>
       </uap:VisualElements>
     </Application>
