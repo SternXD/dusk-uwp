@@ -1,23 +1,53 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.25)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(AssetDeploy)
 include(FetchContent)
 
 # Setup UWP platform
 set(CMAKE_SYSTEM_NAME WindowsStore)
-set(CMAKE_SYSTEM_VERSION 10.0.19041.0)
+set(CMAKE_SYSTEM_VERSION 10.0)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# todo: does this still support vs2022?
-# > main dusk build seemed to use v145 and 143 throws cryptic errors
-# > so currently it requires a manual switch
-#set(CMAKE_GENERATOR_TOOLSET "v145" CACHE STRING "Platform Toolset" FORCE)
+# Config for main build
+set(DUSK_DIR CACHE PATH "")
+set(DUSK_UWP_TOOLSET "" CACHE STRING "MSVC platform toolset to use for UWP build (e.g. v143, v145). Leave empty to auto-detect from DUSK_DIR/CMakeCache.txt")
+
+# Match UWP toolset with the main Dusk build when possible to avoid ABI/link issues.
+if(MSVC AND NOT CMAKE_GENERATOR_TOOLSET)
+	if(NOT DUSK_UWP_TOOLSET AND DUSK_DIR AND EXISTS "${DUSK_DIR}/CMakeCache.txt")
+		file(STRINGS "${DUSK_DIR}/CMakeCache.txt" _dusk_toolset_line REGEX "^CMAKE_VS_PLATFORM_TOOLSET:STRING=")
+		if(_dusk_toolset_line)
+			string(REGEX REPLACE "^CMAKE_VS_PLATFORM_TOOLSET:STRING=(.+)$" "\\1" DUSK_UWP_TOOLSET "${_dusk_toolset_line}")
+		endif()
+	endif()
+	if(DUSK_UWP_TOOLSET)
+		set(CMAKE_GENERATOR_TOOLSET "${DUSK_UWP_TOOLSET}" CACHE STRING "Platform Toolset" FORCE)
+		message(STATUS "Using MSVC toolset ${CMAKE_GENERATOR_TOOLSET} for UWP build")
+	endif()
+endif()
+
+if(DUSK_DIR AND EXISTS "${DUSK_DIR}/CMakeCache.txt")
+	file(STRINGS "${DUSK_DIR}/CMakeCache.txt" _dusk_crt_line REGEX "^CMAKE_MSVC_RUNTIME_LIBRARY:")
+	if(_dusk_crt_line)
+		list(GET _dusk_crt_line 0 _dusk_crt_line0)
+		if(_dusk_crt_line0 MATCHES "^CMAKE_MSVC_RUNTIME_LIBRARY:[A-Za-z0-9_]+=(.+)$")
+			set(_dusk_rt "${CMAKE_MATCH_1}")
+			if(NOT _dusk_rt MATCHES "DLL")
+				message(FATAL_ERROR
+					"DUSK_DIR must be built with /MD (DLL) CRT for UWP; found CMAKE_MSVC_RUNTIME_LIBRARY=${_dusk_rt}. "
+					"Configure the main Dusk tree with preset windows-msvc-relwithdebinfo-uwp and set DUSK_DIR to that build directory.")
+			endif()
+		endif()
+	endif()
+endif()
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL" CACHE STRING "" FORCE)
+message(STATUS "MSVC runtime library (UWP): ${CMAKE_MSVC_RUNTIME_LIBRARY}")
 
 # Fetch shared UWP deps
 FetchContent_Declare(UwpLibs
     GIT_REPOSITORY https://github.com/worleydl/uwp-dep.git
-    GIT_TAG 6d4136ce5935990d60488305b41b74af4b1790d8
+    GIT_TAG 33914f994ab6a3663a24279bd7a76c190eb4b4e4
 )
 FetchContent_MakeAvailable(UwpLibs)
 
@@ -26,11 +56,11 @@ FetchContent_MakeAvailable(UwpLibs)
 project(dusk-uwp LANGUAGES CXX)
 set_directory_properties(PROPERTIES VS_STARTUP_PROJECT ${PROJECT_NAME})
 
-# Config for main recomp build
-set(DUSK_DIR CACHE PATH "")
 if(NOT DUSK_DIR)
 	message(FATAL_ERROR "DUSK_DIR must point to the Dusk build folder containting the main static lib")
 endif()
+
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/UwpAbseilLibs.cmake)
 
 add_executable(${PROJECT_NAME} WIN32
 	main.cpp
@@ -78,9 +108,9 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 
 set(BinLibs
 	${CMAKE_BINARY_DIR}/_deps/uwplibs-src/x64/lib/libuwp.lib
+	${CMAKE_BINARY_DIR}/_deps/uwplibs-src/x64/lib/nod.lib
 	${CMAKE_BINARY_DIR}/_deps/uwplibs-src/x64/lib/SDL3.lib
 	${CMAKE_BINARY_DIR}/_deps/uwplibs-src/x64/lib/webgpu_dawn.lib
-
 
 	${DUSK_DIR}/extern/aurora/aurora_card.lib
 	${DUSK_DIR}/extern/aurora/aurora_core.lib
@@ -109,49 +139,13 @@ set(BinLibs
 	optimized ${DUSK_DIR}/_deps/freetype-build/freetype.lib
 
 
-	${DUSK_DIR}/_deps/tracy-build/TracyClient.lib
 	${DUSK_DIR}/_deps/xxhash-build/xxhash.lib
 	${DUSK_DIR}/_deps/zstd-build/lib/zstd_static.lib
 
-	# todo: put this is another file or figure out a cleaner way, dll wrap?
-	${DUSK_DIR}/_deps/abseil-cpp-build/absl/base/absl_base.lib
-	${DUSK_DIR}/_deps/abseil-cpp-build/absl/base/absl_log_severity.lib
-	${DUSK_DIR}/_deps/abseil-cpp-build/absl/base/absl_malloc_internal.lib
-	${DUSK_DIR}/_deps/abseil-cpp-build/absl/base/absl_raw_logging_internal.lib
-	${DUSK_DIR}/_deps/abseil-cpp-build/absl/base/absl_spinlock_wait.lib
-	${DUSK_DIR}/_deps/abseil-cpp-build/absl/base/absl_throw_delegate.lib
-	${DUSK_DIR}/_deps/abseil-cpp-build/absl/container/absl_hashtablez_sampler.lib
-	${DUSK_DIR}/_deps/abseil-cpp-build/absl/container/absl_raw_hash_set.lib
-	${DUSK_DIR}/_deps/abseil-cpp-build/absl/crc/absl_crc32c.lib
-	${DUSK_DIR}/_deps/abseil-cpp-build/absl/crc/absl_crc_cord_state.lib
-	${DUSK_DIR}/_deps/abseil-cpp-build/absl/crc/absl_crc_cpu_detect.lib
-	${DUSK_DIR}/_deps/abseil-cpp-build/absl/crc/absl_crc_internal.lib
-	${DUSK_DIR}/_deps/abseil-cpp-build/absl/hash/absl_city.lib
-	${DUSK_DIR}/_deps/abseil-cpp-build/absl/hash/absl_hash.lib
-	${DUSK_DIR}/_deps/abseil-cpp-build/absl/hash/absl_low_level_hash.lib
-	${DUSK_DIR}/_deps/abseil-cpp-build/absl/numeric/absl_int128.lib
-	${DUSK_DIR}/_deps/abseil-cpp-build/absl/profiling/absl_exponential_biased.lib
-	${DUSK_DIR}/_deps/abseil-cpp-build/absl/strings/absl_cord.lib
-	${DUSK_DIR}/_deps/abseil-cpp-build/absl/strings/absl_cordz_functions.lib
-	${DUSK_DIR}/_deps/abseil-cpp-build/absl/strings/absl_cordz_handle.lib
-	${DUSK_DIR}/_deps/abseil-cpp-build/absl/strings/absl_cordz_info.lib
-	${DUSK_DIR}/_deps/abseil-cpp-build/absl/strings/absl_cord_internal.lib
-	${DUSK_DIR}/_deps/abseil-cpp-build/absl/strings/absl_strings.lib
-	${DUSK_DIR}/_deps/abseil-cpp-build/absl/strings/absl_strings_internal.lib
-	${DUSK_DIR}/_deps/abseil-cpp-build/absl/strings/absl_string_view.lib
-	${DUSK_DIR}/_deps/abseil-cpp-build/absl/strings/absl_str_format_internal.lib
-	${DUSK_DIR}/_deps/abseil-cpp-build/absl/synchronization/absl_graphcycles_internal.lib
-	${DUSK_DIR}/_deps/abseil-cpp-build/absl/synchronization/absl_kernel_timeout_internal.lib
-	${DUSK_DIR}/_deps/abseil-cpp-build/absl/synchronization/absl_synchronization.lib
-	${DUSK_DIR}/_deps/abseil-cpp-build/absl/time/absl_civil_time.lib
-	${DUSK_DIR}/_deps/abseil-cpp-build/absl/time/absl_time.lib
-	${DUSK_DIR}/_deps/abseil-cpp-build/absl/time/absl_time_zone.lib
-	${DUSK_DIR}/_deps/abseil-cpp-build/absl/types/absl_bad_optional_access.lib
-	${DUSK_DIR}/_deps/abseil-cpp-build/absl/types/absl_bad_variant_access.lib
+	${DUSK_ABSEIL_LIBS}
 
 	${DUSK_DIR}/libjpeg-turbo-install/lib/jpeg-static.lib
 	${DUSK_DIR}/libjpeg-turbo-install/lib/turbojpeg-static.lib # MT conflict
-	${DUSK_DIR}/_deps/nod_prebuilt-src/lib/nod.lib
 
 	${DUSK_DIR}/JSystem_J2DGraph.lib
 	${DUSK_DIR}/JSystem_J3DGraphAnimator.lib
@@ -179,9 +173,19 @@ set(BinLibs
 
 	WindowsApp.lib
 	OneCore.lib
+	ntdll.lib
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${BinLibs})
+
+if(MSVC)
+	target_link_options(${PROJECT_NAME} PRIVATE
+		/NODEFAULTLIB:libcmt
+		/NODEFAULTLIB:libcmtd
+	)
+endif()
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE AURORA_WINDOWS_STORE)
 
 # Data deployment
 uwp_pkg(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/../res "res")

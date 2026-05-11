@@ -23,6 +23,7 @@ orig/*/*
 
 # Build files
 build/
+build-uwp/
 .ninja_*
 build.ninja
 

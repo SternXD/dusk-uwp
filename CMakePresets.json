@@ -19,7 +19,7 @@
       "hidden": true,
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-        "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreaded"
+        "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
       }
     },
     {
@@ -131,6 +131,14 @@
     {
       "name": "windows-msvc-relwithdebinfo",
       "displayName": "Windows (MSVC) RelWithDebInfo",
+      "inherits": [
+        "relwithdebinfo",
+        "windows-msvc"
+      ]
+    },
+    {
+      "name": "windows-msvc-relwithdebinfo-uwp",
+      "displayName": "Windows (MSVC) RelWithDebInfo for UWP",
       "inherits": [
         "relwithdebinfo",
         "windows-msvc"
@@ -586,6 +594,12 @@
       "configurePreset": "windows-msvc-relwithdebinfo",
       "description": "Windows (MSVC) release build with debug info",
       "displayName": "Windows (MSVC) RelWithDebInfo"
+    },
+    {
+      "name": "windows-msvc-relwithdebinfo-uwp",
+      "configurePreset": "windows-msvc-relwithdebinfo-uwp",
+      "description": "Windows (MSVC) RelWithDebInfo with /MD for linking into UWP",
+      "displayName": "Windows (MSVC) RelWithDebInfo (UWP feed)"
     },
     {
       "name": "windows-clang-debug",

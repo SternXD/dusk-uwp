@@ -1,0 +1,36 @@
+set(DUSK_ABSEIL_LIBS
+	${DUSK_DIR}/_deps/abseil-cpp-build/absl/base/absl_base.lib
+	${DUSK_DIR}/_deps/abseil-cpp-build/absl/base/absl_log_severity.lib
+	${DUSK_DIR}/_deps/abseil-cpp-build/absl/base/absl_malloc_internal.lib
+	${DUSK_DIR}/_deps/abseil-cpp-build/absl/base/absl_raw_logging_internal.lib
+	${DUSK_DIR}/_deps/abseil-cpp-build/absl/base/absl_spinlock_wait.lib
+	${DUSK_DIR}/_deps/abseil-cpp-build/absl/base/absl_throw_delegate.lib
+	${DUSK_DIR}/_deps/abseil-cpp-build/absl/container/absl_hashtablez_sampler.lib
+	${DUSK_DIR}/_deps/abseil-cpp-build/absl/container/absl_raw_hash_set.lib
+	${DUSK_DIR}/_deps/abseil-cpp-build/absl/crc/absl_crc32c.lib
+	${DUSK_DIR}/_deps/abseil-cpp-build/absl/crc/absl_crc_cord_state.lib
+	${DUSK_DIR}/_deps/abseil-cpp-build/absl/crc/absl_crc_cpu_detect.lib
+	${DUSK_DIR}/_deps/abseil-cpp-build/absl/crc/absl_crc_internal.lib
+	${DUSK_DIR}/_deps/abseil-cpp-build/absl/hash/absl_city.lib
+	${DUSK_DIR}/_deps/abseil-cpp-build/absl/hash/absl_hash.lib
+	${DUSK_DIR}/_deps/abseil-cpp-build/absl/hash/absl_low_level_hash.lib
+	${DUSK_DIR}/_deps/abseil-cpp-build/absl/numeric/absl_int128.lib
+	${DUSK_DIR}/_deps/abseil-cpp-build/absl/profiling/absl_exponential_biased.lib
+	${DUSK_DIR}/_deps/abseil-cpp-build/absl/strings/absl_cord.lib
+	${DUSK_DIR}/_deps/abseil-cpp-build/absl/strings/absl_cordz_functions.lib
+	${DUSK_DIR}/_deps/abseil-cpp-build/absl/strings/absl_cordz_handle.lib
+	${DUSK_DIR}/_deps/abseil-cpp-build/absl/strings/absl_cordz_info.lib
+	${DUSK_DIR}/_deps/abseil-cpp-build/absl/strings/absl_cord_internal.lib
+	${DUSK_DIR}/_deps/abseil-cpp-build/absl/strings/absl_strings.lib
+	${DUSK_DIR}/_deps/abseil-cpp-build/absl/strings/absl_strings_internal.lib
+	${DUSK_DIR}/_deps/abseil-cpp-build/absl/strings/absl_string_view.lib
+	${DUSK_DIR}/_deps/abseil-cpp-build/absl/strings/absl_str_format_internal.lib
+	${DUSK_DIR}/_deps/abseil-cpp-build/absl/synchronization/absl_graphcycles_internal.lib
+	${DUSK_DIR}/_deps/abseil-cpp-build/absl/synchronization/absl_kernel_timeout_internal.lib
+	${DUSK_DIR}/_deps/abseil-cpp-build/absl/synchronization/absl_synchronization.lib
+	${DUSK_DIR}/_deps/abseil-cpp-build/absl/time/absl_civil_time.lib
+	${DUSK_DIR}/_deps/abseil-cpp-build/absl/time/absl_time.lib
+	${DUSK_DIR}/_deps/abseil-cpp-build/absl/time/absl_time_zone.lib
+	${DUSK_DIR}/_deps/abseil-cpp-build/absl/types/absl_bad_optional_access.lib
+	${DUSK_DIR}/_deps/abseil-cpp-build/absl/types/absl_bad_variant_access.lib
+)
