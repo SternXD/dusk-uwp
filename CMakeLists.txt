@@ -5,6 +5,10 @@ if (NOT CMAKE_BUILD_TYPE)
             "Build type options: Debug Release RelWithDebInfo MinSizeRel" FORCE)
 endif ()
 
+# hack: todo cleanup
+# aurora and some other deps slipped thru as /MT for some reason
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+
 # obtain revision info from git
 find_package(Git)
 if (GIT_FOUND)

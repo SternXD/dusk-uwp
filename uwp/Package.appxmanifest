@@ -9,8 +9,8 @@
 
   <Identity
     Name="dusk"
-    Publisher="CN=danwo"
-    Version="1.6.0.0" />
+    Publisher="CN=odolwa"
+    Version="1.0.0.1" />
 
   <mp:PhoneIdentity PhoneProductId="5a528e66-e0fc-43fb-b377-ce0b1bb0d3e8" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
