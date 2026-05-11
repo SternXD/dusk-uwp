@@ -19,7 +19,7 @@ function(uwp_pkg TARGET SOURCE_DIR DEST_SUBDIR)
 
         set_source_files_properties("${SRC}" PROPERTIES
             VS_COPY_TO_OUT_DIR Always
-            VS_DEPLOYMENT_CONTENT TRUE
+            VS_DEPLOYMENT_CONTENT 1
             VS_DEPLOYMENT_LOCATION "${DEPLOY_DIR}"
         )
 

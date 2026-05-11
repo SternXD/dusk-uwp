@@ -8,15 +8,15 @@
   IgnorableNamespaces="uap mp">
 
   <Identity
-    Name="dusk"
+    Name="Dusk"
     Publisher="CN=odolwa"
-    Version="1.0.0.1" />
+    Version="1.0.1.0" />
 
   <mp:PhoneIdentity PhoneProductId="5a528e66-e0fc-43fb-b377-ce0b1bb0d3e8" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
     <DisplayName>Dusk</DisplayName>
-    <PublisherDisplayName>danwo</PublisherDisplayName>
+    <PublisherDisplayName>danwo/SternXD</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
@@ -38,7 +38,8 @@
         Square44x44Logo="Assets\Square44x44Logo.png"
         Description="Port of Dusk for UWP"
         BackgroundColor="transparent">
-	<!--<uap:SplashScreen Image="Assets\SplashScreen.png" /> -->
+	      <uap:SplashScreen 
+        Image="Assets\SplashScreen.png" />
         <uap:DefaultTile/>
       </uap:VisualElements>
     </Application>

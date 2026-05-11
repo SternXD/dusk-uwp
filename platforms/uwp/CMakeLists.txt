@@ -89,6 +89,7 @@ set(PkgAssets
 	Assets/Square44x44Logo.scale-200.png
 	Assets/Square150x150Logo.scale-200.png
 	Assets/StoreLogo.png
+	Assets/SplashScreen.scale-200.png
 )
 source_group("PkgAssets" FILES ${PkgAssets})
 set_source_files_properties(${PkgAssets} PROPERTIES
@@ -188,4 +189,4 @@ endif()
 target_compile_definitions(${PROJECT_NAME} PRIVATE AURORA_WINDOWS_STORE)
 
 # Data deployment
-uwp_pkg(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/../res "res")
+uwp_pkg(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/../../res "res")
