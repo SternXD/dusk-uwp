@@ -253,11 +253,13 @@ namespace dusk {
 
         UpdateSettings();
 
+#ifndef _UWP
         if (ImGui::IsKeyPressed(ImGuiKey_F11)) {
             getSettings().video.enableFullscreen.setValue(!getSettings().video.enableFullscreen);
             VISetWindowFullscreen(getSettings().video.enableFullscreen);
             config::Save();
         }
+#endif
 
         if (ImGui::GetIO().KeyShift && ImGui::IsKeyPressed(ImGuiKey_F1)) {
             if (getSettings().backend.enableAdvancedSettings) {

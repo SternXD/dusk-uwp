@@ -392,6 +392,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                     }
                     pane.add_rml("<br/>Changes require a restart.");
                 });
+#ifndef _UWP
             leftPane.register_control(
                 leftPane.add_select_button({
                     .key = "Graphics Backend",
@@ -419,6 +420,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                     }
                     pane.add_rml("<br/>Changes require a restart.");
                 });
+#endif
             leftPane.register_control(
                 leftPane.add_select_button({
                     .key = "Save File Type",
@@ -458,6 +460,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
 
         leftPane.add_section("Display");
 
+#ifndef _UWP
         leftPane.register_control(leftPane.add_button("Toggle Fullscreen").on_pressed([] {
             mDoAud_seStartMenu(kSoundItemChange);
             getSettings().video.enableFullscreen.setValue(!getSettings().video.enableFullscreen);
@@ -473,6 +476,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
             VICenterWindow();
         }),
             rightPane, [](Pane& pane) { pane.clear(); });
+#endif
         config_bool_select(leftPane, rightPane, getSettings().video.enableVsync,
             {
                 .key = "Enable VSync",
@@ -489,11 +493,13 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                             value ? AURORA_VIEWPORT_FIT : AURORA_VIEWPORT_STRETCH);
                     },
             });
+#ifndef _UWP
         config_bool_select(leftPane, rightPane, getSettings().game.pauseOnFocusLost,
             {
                 .key = "Pause on Focus Lost",
                 .isDisabled = [] { return IsMobile; },
             });
+#endif
         leftPane.register_control(
             leftPane.add_select_button({
                 .key = "Show FPS Counter",
@@ -626,12 +632,14 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                 pane.clear();
                 pane.add_text("Open controller binding configuration.");
             });
+#ifndef _UWP
         config_bool_select(leftPane, rightPane, getSettings().game.allowBackgroundInput,
             {
                 .key = "Allow Background Input",
                 .helpText = "Allow controller input even when the game window is not focused.",
                 .onChange = [](bool value) { aurora_set_background_input(value); },
             });
+#endif
 
         leftPane.add_section("Camera");
         addOption("Free Camera", getSettings().game.freeCamera,
@@ -1062,6 +1070,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                 .key = "Show Pipeline Compilation",
                 .helpText = "Show an overlay when shaders are being compiled for your hardware.",
             });
+#ifndef _UWP
         config_bool_select(leftPane, rightPane, getSettings().backend.checkForUpdates,
             {
                 .key = "Check for Updates",
@@ -1074,6 +1083,7 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                 .helpText = "Pause the game when window focus is lost.",
                 .onChange = [](bool value) { aurora_set_pause_on_focus_lost(value); },
             });
+#endif
         config_bool_select(leftPane, rightPane, getSettings().backend.enableAdvancedSettings,
             {
                 .key = "Enable Advanced Settings",
