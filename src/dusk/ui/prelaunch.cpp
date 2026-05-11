@@ -234,6 +234,9 @@ std::optional<DiscVerificationResult> take_finished_disc_verification() {
 }
 
 void begin_update_check() {
+#if defined(_UWP)
+    return;
+#endif
     if (!getSettings().backend.checkForUpdates.getValue()) {
         return;
     }
