@@ -1,7 +1,10 @@
 #include <cstdio>
 #include <filesystem>
 
+#include "dusk/app_info.hpp"
 #include "dusk/io.hpp"
+
+#include <SDL3/SDL_filesystem.h>
 
 using namespace dusk::io;
 
@@ -170,3 +173,29 @@ FILE* FileStream::ToInner() {
     file = nullptr;
     return handle;
 }
+
+#if defined(_UWP)
+std::optional<std::filesystem::path> dusk::io::uwp_local_folder_path() {
+    char* pref = SDL_GetPrefPath(dusk::OrgName, dusk::AppName);
+    if (pref == nullptr) {
+        return std::nullopt;
+    }
+    const std::filesystem::path p = path_from_utf8(pref);
+    SDL_free(pref);
+    if (p.empty()) {
+        return std::nullopt;
+    }
+    std::error_code ec;
+    const std::filesystem::path out = std::filesystem::absolute(p, ec).lexically_normal();
+    if (ec || out.empty()) {
+        return std::nullopt;
+    }
+    if (!std::filesystem::exists(out, ec)) {
+        return std::nullopt;
+    }
+    if (!std::filesystem::is_directory(out, ec)) {
+        return std::nullopt;
+    }
+    return out;
+}
+#endif

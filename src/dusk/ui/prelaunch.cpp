@@ -7,6 +7,7 @@
 #include "dusk/main.h"
 #include "dusk/settings.h"
 #include "dusk/update_check.hpp"
+#include "file_browser.hpp"
 #include "modal.hpp"
 #include "preset.hpp"
 #include "settings.hpp"
@@ -510,6 +511,13 @@ PrelaunchState sPrelaunchState;
 
 }  // namespace
 
+void queue_disc_image_from_browser(std::string path) noexcept {
+    if (path.empty()) {
+        return;
+    }
+    begin_disc_verification(std::move(path));
+}
+
 PrelaunchState& prelaunch_state() noexcept {
     return sPrelaunchState;
 }
@@ -651,6 +659,12 @@ void ensure_initialized() noexcept {
 
 void open_iso_picker() noexcept {
     ensure_initialized();
+#if defined(_UWP)
+    if (Document* host = top_document()) {
+        host->push(std::make_unique<FileBrowser>());
+        return;
+    }
+#endif
     ShowFileSelect(&file_dialog_callback, nullptr, aurora::window::get_sdl_window(),
         kDiscFileFilters.data(), kDiscFileFilters.size(), nullptr, false);
 }

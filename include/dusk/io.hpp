@@ -100,6 +100,20 @@ inline std::string fs_path_to_string(const std::filesystem::path& path) {
     return {reinterpret_cast<const char*>(u8str.c_str())};
 }
 
+inline std::filesystem::path path_from_utf8(std::string_view value) {
+    if (value.empty()) {
+        return {};
+    }
+    return std::filesystem::path{
+        reinterpret_cast<const char8_t*>(value.data()),
+        reinterpret_cast<const char8_t*>(value.data() + value.size()),
+    };
+}
+
+#if defined(_UWP)
+std::optional<std::filesystem::path> uwp_local_folder_path();
+#endif
+
 }  // namespace dusk::io
 
 #endif  // DUSK_IO_HPP

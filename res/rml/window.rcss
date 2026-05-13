@@ -515,3 +515,53 @@ progress.verification-progress-bar {
     flex: 0 0 auto;
     padding-top: 4dp;
 }
+
+window.modal.file-browser {
+    max-width: 720dp;
+    width: 96%;
+    max-height: 640dp;
+    backdrop-filter: none;
+}
+
+.file-browser-toolbar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12dp;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.file-browser-path {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-family: "Noto Mono";
+    font-size: 13dp;
+    color: rgba(224, 219, 200, 85%);
+    word-break: break-all;
+}
+
+.file-browser-error {
+    display: none;
+    width: 100%;
+    font-size: 15dp;
+    color: #E8A598;
+}
+
+.file-browser-list {
+    display: block;
+    width: 100%;
+    max-height: 320dp;
+    overflow-y: auto;
+    border: 1dp solid rgba(146, 135, 91, 40%);
+    border-radius: 8dp;
+    padding: 8dp 4dp;
+    background-color: rgba(0, 0, 0, 15%);
+}
+
+button.file-browser-row {
+    display: block;
+    width: 100%;
+    text-align: left;
+    margin-bottom: 4dp;
+}

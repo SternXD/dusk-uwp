@@ -16,6 +16,7 @@ public:
     explicit Pane(Rml::Element* parent, Type type);
 
     bool focus() override;
+    bool focus_last();
     void update() override;
 
     void set_selected_item(int index);
@@ -34,6 +35,9 @@ public:
     Rml::Element* add_rml(const Rml::String& rml);
     void finalize();
     void clear();
+
+    int child_index_containing(Rml::Element* target) const;
+    int row_count() const noexcept;
 
 private:
     Type mType;

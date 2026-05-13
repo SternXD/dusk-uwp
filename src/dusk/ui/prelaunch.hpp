@@ -60,6 +60,7 @@ PrelaunchState& prelaunch_state() noexcept;
 void ensure_initialized() noexcept;
 void refresh_configured_disc_state() noexcept;
 void open_iso_picker() noexcept;
+void queue_disc_image_from_browser(std::string path) noexcept;
 bool is_restart_pending() noexcept;
 void try_push_verification_modal(Document& host);
 

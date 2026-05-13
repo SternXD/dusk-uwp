@@ -3,6 +3,7 @@
 #include "aurora/gfx.h"
 #include "bool_button.hpp"
 #include "controller_config.hpp"
+#include "file_browser.hpp"
 #include "dusk/app_info.hpp"
 #include "dusk/audio/DuskAudioSystem.h"
 #include "dusk/audio/DuskDsp.hpp"
@@ -300,29 +301,6 @@ private:
     Rml::String mCurrentRml;
 };
 
-void show_data_folder_error_modal(std::string_view message) {
-    auto dismiss = [](Modal& modal) {
-        mDoAud_seStartMenu(kSoundWindowClose);
-        modal.pop();
-    };
-    push_document(std::make_unique<Modal>(Modal::Props{
-        .title = "Data Folder Not Changed",
-        .bodyRml = escape(message),
-        .actions =
-            {
-                ModalAction{
-                    .label = "OK",
-                    .onPressed = dismiss,
-                },
-            },
-        .onDismiss = dismiss,
-        .icon = "warning",
-    }));
-    if (auto* doc = top_document()) {
-        doc->focus();
-    }
-}
-
 void data_folder_dialog_callback(void*, const char* path, const char* error) {
     if (error != nullptr) {
         show_data_folder_error_modal(error);
@@ -476,6 +454,44 @@ void graphics_tuner_control(Window& window, Pane& leftPane, Pane& rightPane, Con
 
 }  // namespace
 
+void show_data_folder_error_modal(std::string_view message) {
+    auto dismiss = [](Modal& modal) {
+        mDoAud_seStartMenu(kSoundWindowClose);
+        modal.pop();
+    };
+    push_document(std::make_unique<Modal>(Modal::Props{
+        .title = "Data Folder Not Changed",
+        .bodyRml = escape(message),
+        .actions =
+            {
+                ModalAction{
+                    .label = "OK",
+                    .onPressed = dismiss,
+                },
+            },
+        .onDismiss = dismiss,
+        .icon = "warning",
+    }));
+    if (auto* doc = top_document()) {
+        doc->focus();
+    }
+}
+
+bool apply_picked_data_folder(std::string utf8_path) {
+    std::string dataPathError;
+    if (data::set_custom_data_path(utf8_path.c_str(), &dataPathError)) {
+        mDoAud_seStartMenu(kSoundItemChange);
+        return true;
+    }
+
+    if (dataPathError.empty()) {
+        dataPathError =
+            fmt::format("{} could not use the selected folder as its data folder.", AppName);
+    }
+    show_data_folder_error_modal(dataPathError);
+    return false;
+}
+
 SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
     if (prelaunch) {
         mSuppressNavFallback = true;
@@ -532,6 +548,12 @@ SettingsWindow::SettingsWindow(bool prelaunch) : mPrelaunch(prelaunch) {
                     });
 #endif
                     pane.add_button("Change Data Folder").on_pressed([] {
+#if defined(_UWP)
+                        if (Document* host = top_document()) {
+                            host->push(std::make_unique<FileBrowser>(FileBrowserPurpose::DataFolder));
+                            return;
+                        }
+#endif
                         const auto defaultLocation =
                             io::fs_path_to_string(data::configured_data_path());
                         ShowFolderSelect(&data_folder_dialog_callback, nullptr,

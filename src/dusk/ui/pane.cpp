@@ -163,6 +163,15 @@ bool Pane::focus() {
     return false;
 }
 
+bool Pane::focus_last() {
+    for (int i = static_cast<int>(mChildren.size()) - 1; i >= 0; --i) {
+        if (mChildren[static_cast<std::size_t>(i)]->focus()) {
+            return true;
+        }
+    }
+    return false;
+}
+
 Rml::Element* Pane::add_section(const Rml::String& text) {
     auto* elem = append(mRoot, "div");
     elem->SetClass("section-heading", true);
@@ -198,6 +207,22 @@ void Pane::finalize() {
 void Pane::clear() {
     clear_children();
     finalized = false;
+}
+
+int Pane::child_index_containing(Rml::Element* target) const {
+    if (target == nullptr) {
+        return -1;
+    }
+    for (int i = 0; i < static_cast<int>(mChildren.size()); ++i) {
+        if (mChildren[static_cast<std::size_t>(i)]->contains(target)) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+int Pane::row_count() const noexcept {
+    return static_cast<int>(mChildren.size());
 }
 
 }  // namespace dusk::ui
