@@ -493,6 +493,24 @@ static std::filesystem::path calculate_config_path() {
 #endif
 #endif
 
+#if defined(_WIN32)
+    const std::filesystem::path externalConfigPath = "E:/dusklight";
+    std::error_code ec;
+    if (std::filesystem::exists(externalConfigPath, ec) && std::filesystem::is_directory(externalConfigPath, ec)) {
+        char* oldPrefPath = SDL_GetPrefPath(dusk::OrgName, dusk::AppName);
+        if (oldPrefPath) {
+            const std::filesystem::path oldConfigPath = reinterpret_cast<const char8_t*>(oldPrefPath);
+            SDL_free(oldPrefPath);
+
+            if (oldConfigPath != externalConfigPath && std::filesystem::exists(oldConfigPath, ec)) {
+                migrate_directory(oldConfigPath, externalConfigPath);
+            }
+        }
+
+        return externalConfigPath;
+    }
+#endif
+
     const auto result = SDL_GetPrefPath(dusk::OrgName, dusk::AppName);
     if (!result) {
         DuskLog.fatal("Unable to get PrefPath: {}", SDL_GetError());
